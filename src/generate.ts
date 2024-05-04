@@ -280,7 +280,7 @@ const compute_zodiac = (c: MonthData): Array<TaggedTime> => {
 // in ecliptic longitude
 // forward from the given date.
 //
-function moon_planet_conjunction(date0: number, planet: string): number|null {
+function moon_planet_conjunction(date0: number, planet: string): number | null {
   //
   // compute how many degrees the moon is away from the planet
   // this function is positive from 180 degrees behind down
@@ -294,14 +294,14 @@ function moon_planet_conjunction(date0: number, planet: string): number|null {
     const d = moonlon - planetlon;
     return d > 180 ? d - 360 : d < -180 ? d + 360 : d;
   }
-    function moon_planet_conjunction_time(time0: number) {
+  function moon_planet_conjunction_time(time0: number) {
     let t0;
     let d0;
     for (const t1 of ephemerides_cached_times()) {
       const d1 = degrees_from_conjunction(t1);
       if (t1 < time0) continue;
       if (d1 === 0) return t1;
-	if (t0 !== undefined && d0 !== undefined && d1 * d0 < 0 && d0 < 0) {
+      if (t0 !== undefined && d0 !== undefined && d1 * d0 < 0 && d0 < 0) {
         return find_zero_by_brents_method(
           degrees_from_conjunction,
           t0,
@@ -309,10 +309,9 @@ function moon_planet_conjunction(date0: number, planet: string): number|null {
           t1,
           d1
         );
-      } else {
-        t0 = t1;
-        d0 = d1;
       }
+      t0 = t1;
+      d0 = d1;
     }
     return null;
   }
@@ -326,7 +325,7 @@ function moon_planet_conjunction(date0: number, planet: string): number|null {
 //
 export const compute_planets = (c: MonthData): Array<TaggedTime> => {
   const planet_date: Array<TaggedTime> = [];
-    for (const p of Object.keys(Ephemerides.Planets)) {
+  for (const p of Object.keys(Ephemerides.Planets)) {
     let d = moon_planet_conjunction(c.min_date.time, p);
     while (d !== null && d < c.max_date.time) {
       planet_date.push({ tag: p, time: d });
@@ -346,7 +345,7 @@ export const moon_at_phase = (date0: number, _phase: number) => {
   // so it only goes to zero at new moons which are total eclipses
   // we're only concerned with elongation in longitude.
   //
-  function moon_phase_at_time(t:number) {
+  function moon_phase_at_time(t: number) {
     const eph = ephemerides_at_time(t);
     const phase = eph.ephemeris.Moon.lonecl - eph.ephemeris.Sun.lonecl;
     // System.out.print("moon_phase_at_time("+t+") is "+(phase < 0 ? phase + 360 : phase));
@@ -358,12 +357,12 @@ export const moon_at_phase = (date0: number, _phase: number) => {
   // phase starts at zero, increases to 359.9999..., and jumps back to 0
   // so when approaching 0 from below, be careful
   //
-  function error_in_moon_phase(t:number) {
+  function error_in_moon_phase(t: number) {
     const de = _phase - moon_phase_at_time(t);
     return de > 180 ? de - 360 : de < -180 ? de + 360 : de;
   }
 
-    function moon_at_phase_time(time0:number) {
+  function moon_at_phase_time(time0: number) {
     const x0 = time0;
     const y0 = error_in_moon_phase(x0);
     const x1 = x0 + 1.25 * y0 * millis_per_degree;
@@ -379,14 +378,21 @@ export const moon_at_phase = (date0: number, _phase: number) => {
 // starting from the nearest new moon to date
 // and working forward in time
 //
-export const compute_month = (c: MonthData, date: number, n: number): Array<TaggedTime> => {
-    // console.log(`compute_month(..., ${date.toString()}, ${n})`);
-    const month_date = new Array(n + 1);
-    month_date[0] = {tag: `0/${n}`, time: date};
-    const dt = (29.5 / (n - 1)) * millis_per_day;
-    for (let i = 1; i <= n; i += 1) {
-	const from_date = month_date[i - 1].time + dt;
-	month_date[i] = {tag: `${i}/${n}`, time: moon_at_phase(from_date, (i * (360 / n)) % 360)};
+export const compute_month = (
+  c: MonthData,
+  date: number,
+  n: number
+): Array<TaggedTime> => {
+  // console.log(`compute_month(..., ${date.toString()}, ${n})`);
+  const month_date = new Array(n + 1);
+  month_date[0] = { tag: `0/${n}`, time: date };
+  const dt = (29.5 / (n - 1)) * millis_per_day;
+  for (let i = 1; i <= n; i += 1) {
+    const from_date = month_date[i - 1].time + dt;
+    month_date[i] = {
+      tag: `${i}/${n}`,
+      time: moon_at_phase(from_date, (i * (360 / n)) % 360),
+    };
   }
   return month_date;
 };
@@ -396,7 +402,7 @@ const compute = (c: MonthData) => {
   c.start0 = moon_at_phase(c.start, 0);
   // console.log(`moon_at_phase(${c.start}, 0) returned ${c.start0}`);
   // this should return an array of times for the nphases of the moon
-    c.phases = compute_month(c, c.start0, c.nphases());
+  c.phases = compute_month(c, c.start0, c.nphases());
   // console.log(`compute_month returned ${c.m_date.map((d) => d).join(', ')}`);
   c.min_date = c.phases[0];
   c.max_date = c.phases[c.nphases()];

@@ -15,20 +15,20 @@ export interface DrawOptions {
   new_moon_dates: boolean;
   title: boolean;
   copyright: boolean;
-    days: boolean;
-    aries: boolean;
-    zodiac: boolean;
-};
+  days: boolean;
+  aries: boolean;
+  zodiac: boolean;
+}
 
 export interface TaggedTime {
   tag: string;
   time: number;
-};
+}
 
 export class MonthData {
   start: number; // start time stamp
 
-    start0: number; // time stamp of new moon near start
+  start0: number; // time stamp of new moon near start
 
   min_date: TaggedTime; // tagged time stamp of first new moon
 
@@ -58,7 +58,7 @@ export class MonthData {
     // initialize dummy moon positions: p0 .. p${_nphases}
     const dt = (29.5 * 24 * 60 * 60 * 1000) / _nphases;
     for (let p = 0; p <= _nphases; p += 1) {
-	this.phases[p] = {tag: `${p}/${_nphases}`, time:_start + p * dt};
+      this.phases[p] = { tag: `${p}/${_nphases}`, time: _start + p * dt };
     }
     // initialize dummy planet positions
     // initialize dummy gee positions
@@ -68,7 +68,7 @@ export class MonthData {
   }
 
   nphases() {
-    return this.phases.length-1;
+    return this.phases.length - 1;
   }
 
   start_date() {

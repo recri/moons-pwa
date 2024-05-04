@@ -14,7 +14,7 @@ import './moons-about.js';
 
 const search_params = () => {
   const now = Date.now();
-    const dateNow = new Date(now);
+  const dateNow = new Date(now);
   const year = dateNow.getFullYear();
   const month = dateNow.getMonth();
   const day = dateNow.getDate();
@@ -51,12 +51,12 @@ const search_params = () => {
     },
     // how to validate values
     validations: {
-	start: (x: string) => new Date(x),
-	months: (x: string) => Number(x) > 0,
-	phases: (x: string) => (Number(x) & (Number(x) - 1)) === 0, // power of two
-	days: (x: string) => Number(x) > 30,
-	border: (x: string) => Number(x) >= 0,
-	moon_per_cent: (x: string) => Number(x) > 0 && Number(x) <= 100,
+      start: (x: string) => new Date(x),
+      months: (x: string) => Number(x) > 0,
+      phases: (x: string) => (Number(x) & (Number(x) - 1)) === 0, // power of two
+      days: (x: string) => Number(x) > 30,
+      border: (x: string) => Number(x) >= 0,
+      moon_per_cent: (x: string) => Number(x) > 0 && Number(x) <= 100,
     },
     params: {
       // the default values merged with values from search string
@@ -81,15 +81,18 @@ const search_params = () => {
         new_moon_dates: true,
         title: true,
         copyright: true,
-	  days: true,
-	  aries: false,
-	  zodiac: false,
+        days: true,
+        aries: false,
+        zodiac: false,
       },
     },
   };
 };
 
-const parse_search = (search: URLSearchParams, { proto, defaults, params, validations }) => {
+const parse_search = (
+  search: URLSearchParams,
+  { proto, defaults, params, validations }
+) => {
   //
   // merge default values into the params arrays
   //
@@ -117,14 +120,12 @@ const parse_search = (search: URLSearchParams, { proto, defaults, params, valida
     }
   };
 
-    for (let [name,value] of Object.entries(search)) {
+  for (const [name, value] of Object.entries(search)) {
     if (proto[name]) {
-	if (proto[name] !== name) name = proto[name];
-	params[name] = search[name];
+      if (proto[name] !== name) params[proto[name]] = search[name];
+      else params[name] = search[name];
     } else {
-      console.log(
-          `unrecognized parameter: '${name}' with value '${value}'`
-      );
+      console.log(`unrecognized parameter: '${name}' with value '${value}'`);
     }
   }
 
