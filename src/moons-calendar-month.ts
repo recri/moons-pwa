@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 import { LitElement, html, css, svg } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
-import { SVGTemplateResult } from 'lit-html';
 
 import {
   draw_nil,
@@ -15,11 +14,15 @@ import {
   phase_path_points,
 } from './moons-svg.js';
 
-import { MonthData } from './moons-calendar-interfaces.js';
+import { MonthData, ParamOptions, DrawOptions } from './moons-interfaces.js';
+
+const millis_per_day = 24 * 60 * 60 * 1000; // milliseconds in a day
 
 @customElement('moons-calendar-month')
 export class MoonsCalendarMonth extends LitElement {
-  @property({ type: Object }) params!: any;
+  @property({ type: Object }) params!: ParamOptions;
+
+  @property({ type: Object }) draw!: DrawOptions;
 
   @property({ type: Object }) monthdata!: MonthData;
 
@@ -29,8 +32,8 @@ export class MoonsCalendarMonth extends LitElement {
   `;
 
   render() {
-    const millis_per_day = 24 * 60 * 60 * 1000; // milliseconds in a day
-    const { phases, days, border, moon_per_cent, scale, draw } = this.params;
+    const { phases, days, border, moon_per_cent, scale } = this.params;
+    const { draw } = this;
     const dwidth = border + days + border;
     const width = dwidth * scale;
     const dheight = 1;
@@ -44,17 +47,14 @@ export class MoonsCalendarMonth extends LitElement {
     const pfull = phases / 2;
     const pnew0 = 0;
     const pnew1 = phases;
-    // const first_day = this.monthdata.phase[pnew0];
-    // const middle_day = this.monthdata.phase[pfull];
-    // const last_day = this.monthdata.phase[pnew1];
 
-    const generate_month = monthdata => {
+    const generate_month = (monthdata: MonthData) => {
       // const mnew0 = monthdata.phases[pnew0], mfull = monthdata.phases[pfull], mnew1 = month.m_date[pnew1];
-      const tnew0 = monthdata.phases[pnew0];
-      const tfull = monthdata.phases[pfull];
-      const tnew1 = monthdata.phases[pnew1];
+      const tnew0 = monthdata.phases[pnew0].time;
+      const tfull = monthdata.phases[pfull].time;
+      const tnew1 = monthdata.phases[pnew1].time;
       // const tnew0 = mnew0.getTime(), tfull = mfull.getTime(), tnew1 = mnew1.getTime();
-      const x_for_time = t =>
+      const x_for_time = (t: number): number =>
         Math.round(
           width / 2 + // the x coordinate of the full moon
             ((tfull - // the time of the full moon
@@ -76,9 +76,9 @@ export class MoonsCalendarMonth extends LitElement {
       const draw_moons = () => {
         const cy = scale / 2;
         const r = ((moon_per_cent / 100.0) * scale) / 2;
-        return monthdata.phases.map((date, i) => {
+        return monthdata.phases.map(({ time }, i) => {
           const phase = (i * (360 / phases)) % 360;
-          const cx = x_for_time(date.getTime());
+          const cx = x_for_time(time);
           const d = phase_path_points(phase, r, 36);
           const className = `moon${phase === 0 ? ' new' : ''}`;
           return svg`<path class$="${className}" transform$="translate(${cx},${cy})" d$="${d}" />`;
@@ -86,9 +86,11 @@ export class MoonsCalendarMonth extends LitElement {
       };
 
       const draw_day_ticks_and_numbers = () => {
-        const day_vertical_line = (x, h) => line_node_vertical(x, 0, h);
-        const day_tick_node = (x, h) => btm_tick_node(x, h, 'daytick');
-        const day_number_node = (x, h, d) =>
+        const day_vertical_line = (x: number, h: number) =>
+          line_node_vertical(x, 0, h);
+        const day_tick_node = (x: number, h: number) =>
+          btm_tick_node(x, h, 'daytick');
+        const day_number_node = (x: number, h: number, d: number) =>
           btm_text_node(x, h, 'daynumber', `${d}`);
         // const f_t = tfull / millis_per_day;                   // fractional date of full moon
         const n1_d = Math.floor(tnew0 / millis_per_day); // day of 1st new moon
@@ -109,22 +111,41 @@ export class MoonsCalendarMonth extends LitElement {
       };
 
       const draw_new_moon_dates = () => {
-        const new_moon_date = (x, y, w, h, fill, date, className) =>
-          text_node(x, y, `newmoondate ${className}`, format_date(date));
-        const new_moon_date_left = (x, y, w, h, fill, date) =>
-          new_moon_date(x - 4, y - h / 3, w, h, fill, date, 'left');
-        const new_moon_date_right = (x, y, w, h, fill, date) =>
-          new_moon_date(x + 4, y - h / 3, w, h, fill, date, 'right');
+        const new_moon_date = (
+          x: number,
+          y: number,
+          w: number,
+          h: number,
+          fill: string,
+          date: number,
+          className: string
+        ) => text_node(x, y, `newmoondate ${className}`, format_date(date));
+        const new_moon_date_left = (
+          x: number,
+          y: number,
+          w: number,
+          h: number,
+          fill: string,
+          date: number
+        ) => new_moon_date(x - 4, y - h / 3, w, h, fill, date, 'left');
+        const new_moon_date_right = (
+          x: number,
+          y: number,
+          w: number,
+          h: number,
+          fill: string,
+          date: number
+        ) => new_moon_date(x + 4, y - h / 3, w, h, fill, date, 'right');
         const w = scale;
         const x0 = x_for_time(tnew0 - millis_per_day);
         const x1 = x_for_time(tnew1 + millis_per_day);
         return svg`
-		    ${new_moon_date_right(x0, w, w, w, 'white', new Date(tnew0))}
-		    ${new_moon_date_left(x1, w, w, w, 'white', new Date(tnew1))}
+		    ${new_moon_date_right(x0, w, w, w, 'white', tnew0)}
+		    ${new_moon_date_left(x1, w, w, w, 'white', tnew1)}
                   `;
       };
       const draw_planets = () => {
-        const planet_map = {
+        const planet_map: { [key: string]: string } = {
           Mercury: '☿',
           Venus: '♀',
           Mars: '♂',
@@ -134,34 +155,31 @@ export class MoonsCalendarMonth extends LitElement {
           Neptune: '♆',
           Pluto: '♇',
         };
-        const planet_markers = [];
-        monthdata.planets.forEach((t, planet) => {
-          const x = x_for_time(t);
-          planet_markers.push(
-            top_text_node(x, scale, `planet ${planet}`, planet_map[planet]),
-            top_tick_node(x, scale, 'planettick')
-          );
+        const planet_markers = monthdata.planets.flatMap(({ tag, time }) => {
+          const x = x_for_time(time);
+          return [
+            top_text_node(x, scale, `planet ${tag}`, planet_map[tag]),
+            top_tick_node(x, scale, 'planettick'),
+          ];
         });
         return svg`${planet_markers}`;
       };
       const draw_gees = () => draw_nil();
-      const draw_nodes = (): Array<SVGTemplateResult> => {
-        const node_map = {
+      const draw_nodes = () => {
+        const node_map: { [key: string]: string } = {
           ascending: '☊',
           descending: '☋',
           conjunction: '☌',
           opposition: '☍',
         };
-        const node_markers: Array<SVGTemplateResult> = [];
-        monthdata.nodes.forEach((t, node) => {
-          const x = x_for_time(t);
-          console.log(
-            `drawing ${node} time ${t} node ${node_map[node]} at ${x}`
-          );
-          node_markers.push(top_text_node(x, scale, 'node', node_map[node]));
-          node_markers.push(top_tick_node(x, scale, 'nodetick'));
+        const node_markers = monthdata.nodes.flatMap(({ tag, time }) => {
+          const x = x_for_time(time);
+          return [
+            top_text_node(x, scale, `node ${tag}`, node_map[tag]),
+            top_tick_node(x, scale, 'nodetick'),
+          ];
         });
-        return svg`${node_markers!}`;
+        return svg`${node_markers}`;
       };
       const draw_zodiac = () => draw_nil();
       const draw_mondays = () => draw_nil();

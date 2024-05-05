@@ -40,7 +40,7 @@ import {
   TaggedTime,
   MonthData,
   MonthDataEvent,
-} from './moons-calendar-interfaces.js';
+} from './moons-interfaces.js';
 
 const millis_per_day = 24 * 60 * 60 * 1000; // milliseconds in a day
 const millis_per_degree = (27.3 * 24 * 60 * 60 * 1000) / 360; // milliarcseconds per degree???

@@ -4,7 +4,7 @@
 import { LitElement, html, css } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 
-import { MonthData } from './moons-calendar-interfaces.js';
+import { MonthData, ParamOptions, DrawOptions } from './moons-interfaces.js';
 
 const sequence = (upto: number): Array<number> =>
   Array(Math.floor(upto))
@@ -13,7 +13,9 @@ const sequence = (upto: number): Array<number> =>
 
 @customElement('moons-calendar')
 export class MoonsCalendar extends LitElement {
-  @property({ type: Object }) params: any = {};
+  @property({ type: Object }) params!: ParamOptions;
+
+  @property({ type: Object }) draw!: DrawOptions;
 
   static styles = css`
     :host {
@@ -44,6 +46,7 @@ export class MoonsCalendar extends LitElement {
     );
     return html`<moons-calendar-worker
       .params=${this.params}
+      .draw=${this.draw}
       .monthdata=${monthdata}
     ></moons-calendar-worker>`;
   }

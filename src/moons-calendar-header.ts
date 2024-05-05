@@ -4,7 +4,7 @@ import { LitElement, html, css } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 
 import { text_node, format_date } from './moons-svg.js';
-import { MonthData } from './moons-calendar-interfaces.js';
+import { MonthData } from './moons-interfaces.js';
 
 @customElement('moons-calendar-header')
 export class MoonsCalendarHeader extends LitElement {
@@ -27,7 +27,7 @@ export class MoonsCalendarHeader extends LitElement {
   `;
 
   render() {
-    const { phases, days, border, scale, draw } = this.params;
+    const { months, days, border, scale, draw } = this.params;
     if (!draw.title) return html``;
     const dwidth = border + days + border;
     const width = dwidth * scale;
@@ -38,14 +38,14 @@ export class MoonsCalendarHeader extends LitElement {
     const fheight = 1 * scale;
     // const fx = 0.5 * (width - fwidth);
     const fy = 0.5 * (height - fheight);
-    const first_day = this.monthdata[0].phase[0];
-    const last_day = this.monthdata[this.monthdata.length - 1].phase[phases];
+    const min_date = this.monthdata[0].min_date.time;
+    const max_date = this.monthdata[months - 1].max_date.time;
     const generate_title = () =>
       text_node(
         width / 2,
         fy - scale / 2,
         'calendartitle',
-        `${format_date(first_day)} - Moons - ${format_date(last_day)}`
+        `${format_date(min_date)} - Moons - ${format_date(max_date)}`
       );
 
     return html`

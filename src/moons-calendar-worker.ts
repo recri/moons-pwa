@@ -5,11 +5,13 @@
 import { LitElement, html, css, svg } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 
-import { MonthData } from './moons-calendar-interfaces.js';
+import { MonthData, DrawOptions, ParamOptions } from './moons-interfaces.js';
 
 @customElement('moons-calendar-worker')
 export class MoonsCalendarWorker extends LitElement {
-  @property({ type: Object }) params!: any;
+  @property({ type: Object }) params!: ParamOptions;
+
+  @property({ type: Object }) draw!: DrawOptions;
 
   @property({ type: Array }) monthdata!: Array<MonthData>;
 
@@ -97,9 +99,9 @@ export class MoonsCalendarWorker extends LitElement {
 	    }
 	  </style>
           <div class="frame">
-              <moons-calendar-header .params=${this.params} .data=${
-      this.monthdata
-    }>
+              <moons-calendar-header .params=${this.params} 
+		.draw=${this.draw}
+		.monthdata=${this.monthdata}>
               </moons-calendar-header>
 	    ${this.monthdata.map(
         md =>
