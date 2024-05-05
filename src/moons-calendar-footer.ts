@@ -4,11 +4,13 @@ import { LitElement, html, css } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 
 import { text_node, format_date } from './moons-svg.js';
-import { MonthData } from './moons-interfaces.js';
+import { MonthData, ParamOptions, DrawOptions } from './moons-interfaces.js';
 
-@customElement('moons-calendar-header')
-export class MoonsCalendarHeader extends LitElement {
-  @property({ type: Object }) params!: any;
+@customElement('moons-calendar-footer')
+export class MoonsCalendarFooter extends LitElement {
+  @property({ type: Object }) params!: ParamOptions;
+
+  @property({ type: Object }) draw!: DrawOptions;
 
   @property({ type: Array }) monthdata!: Array<MonthData>;
 
@@ -27,7 +29,8 @@ export class MoonsCalendarHeader extends LitElement {
   `;
 
   render() {
-    const { days, border, scale, draw } = this.params;
+    const { days, border, scale } = this.params;
+    const { draw } = this;
     if (!draw.copyright) return html``;
     const dwidth = border + days + border;
     const width = dwidth * scale;
@@ -49,7 +52,7 @@ export class MoonsCalendarHeader extends LitElement {
         'copyright',
         `${format_date(min_date)} - Moons - ${format_date(max_date)}, ` +
           'Copyright \xa9 2024 by Roger E Critchlow Jr, Las Cruces, NM, USA, ' +
-          'http://elf.org/moons'
+          'https://elf.org/moons'
       );
 
     return html`

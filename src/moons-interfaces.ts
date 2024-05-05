@@ -68,12 +68,17 @@ export class MonthData {
 
   constructor(_month: number, _start: number, _nphases: number) {
     this.month = _month;
+    this.start = _start;
     // initialize dummy day tick marks
     // initialize dummy moon positions: p0 .. p${_nphases}
     const dt = (29.5 * 24 * 60 * 60 * 1000) / _nphases;
     for (let p = 0; p <= _nphases; p += 1) {
       this.phases[p] = { tag: `${p}/${_nphases}`, time: _start + p * dt };
     }
+    // this.min_date = this.phases[0];
+    [this.min_date] = this.phases;
+    // this.max_date = this.phases[_nphases]
+    [, this.max_date] = this.phases;
     // initialize dummy planet positions
     // initialize dummy gee positions
     // initialize dummy node positions

@@ -4,6 +4,8 @@
 import { LitElement, html, css } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 
+import './moons-calendar-worker.js';
+
 import { MonthData, ParamOptions, DrawOptions } from './moons-interfaces.js';
 
 const sequence = (upto: number): Array<number> =>
@@ -36,7 +38,7 @@ export class MoonsCalendar extends LitElement {
   render() {
     const { year, month, day, months, phases, scale } = this.params;
     const start_date = new Date(`${year}-${month}-${day}`);
-    const monthdata = sequence(months - 1).map(
+    const monthdata = sequence(months).map(
       m =>
         new MonthData(
           m,

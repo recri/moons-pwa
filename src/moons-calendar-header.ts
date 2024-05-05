@@ -4,11 +4,13 @@ import { LitElement, html, css } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 
 import { text_node, format_date } from './moons-svg.js';
-import { MonthData } from './moons-interfaces.js';
+import { MonthData, ParamOptions, DrawOptions } from './moons-interfaces.js';
 
 @customElement('moons-calendar-header')
 export class MoonsCalendarHeader extends LitElement {
-  @property({ type: Object }) params!: any;
+  @property({ type: Object }) params!: ParamOptions;
+
+  @property({ type: Object }) draw!: DrawOptions;
 
   @property({ type: Array }) monthdata!: Array<MonthData>;
 
@@ -27,7 +29,8 @@ export class MoonsCalendarHeader extends LitElement {
   `;
 
   render() {
-    const { months, days, border, scale, draw } = this.params;
+    const { months, days, border, scale } = this.params;
+    const { draw } = this;
     if (!draw.title) return html``;
     const dwidth = border + days + border;
     const width = dwidth * scale;

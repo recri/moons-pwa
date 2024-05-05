@@ -137,7 +137,7 @@ export class MoonsApp extends LitElement {
         ? html`<moons-about></moons-about>`
         : html`<moons-calendar
             .params=${params}
-            .draw${draw}
+            .draw=${draw}
           ></moons-calendar>`}
     `;
   }

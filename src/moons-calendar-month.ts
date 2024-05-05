@@ -26,6 +26,8 @@ export class MoonsCalendarMonth extends LitElement {
 
   @property({ type: Object }) monthdata!: MonthData;
 
+  @property({ type: Number }) width: number = 1000;
+
   static styles = css`
     :host {
     }

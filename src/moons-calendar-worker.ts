@@ -5,6 +5,10 @@
 import { LitElement, html, css, svg } from 'lit';
 import { property, customElement } from 'lit/decorators.js';
 
+import './moons-calendar-header.js';
+import './moons-calendar-month.js';
+import './moons-calendar-footer.js';
+
 import { MonthData, DrawOptions, ParamOptions } from './moons-interfaces.js';
 
 @customElement('moons-calendar-worker')
@@ -99,15 +103,26 @@ export class MoonsCalendarWorker extends LitElement {
 	    }
 	  </style>
           <div class="frame">
-              <moons-calendar-header .params=${this.params} 
+              <moons-calendar-header
+		.params=${this.params} 
 		.draw=${this.draw}
-		.monthdata=${this.monthdata}>
+		.monthdata=${this.monthdata}
+		.width=${width}>
               </moons-calendar-header>
 	    ${this.monthdata.map(
         md =>
-          svg`<moons-calendar-month .params=${this.params} .data=${md}></moons-calendar-month>`
+          svg`<moons-calendar-month 
+		.params=${this.params} 
+	        .draw=${this.draw} 
+	        .monthdata=${md}
+                .width=${width}>
+	      </moons-calendar-month>`
       )}
-	    <moons-calendar-footer .params=${this.params} .data=${this.monthdata}>
+	    <moons-calendar-footer 
+		.params=${this.params}
+		.draw=${this.draw}
+		.monthdata=${this.monthdata}
+		.width=${width}>
 	      </moons-calendar-footer>
 	  </svg>
 	`;
